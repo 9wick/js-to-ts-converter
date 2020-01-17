@@ -1,6 +1,8 @@
 import { Project, SyntaxKind } from "ts-morph";
 import { addClassPropertyDeclarations } from "./add-class-property-declarations/add-class-property-declarations";
 import { addOptionalsToFunctionParams } from "./add-optionals-to-function-params";
+import { addAnyToFunctionParams } from "./add-any-to-function-params";
+import { addAnyToVars } from "./add-any-to-vars";
 import { filterOutNodeModules } from "./filter-out-node-modules";
 import logger from "../logger/logger";
 
@@ -54,6 +56,14 @@ export function convert( tsAstProject: Project ): Project {
 	// Service to work.
 	logger.info( 'Making parameters optional for calls that supply fewer args than function parameters...' );
 	tsAstProject = addOptionalsToFunctionParams( tsAstProject );
+
+	logger.info( 'Making parameters any for calls that supply fewer args than function parameters...' );
+	tsAstProject = addAnyToFunctionParams( tsAstProject );
+
+	logger.info( 'Making parameters any for all vars ' );
+	tsAstProject = addAnyToVars( tsAstProject );
+
+
 
 	// Filter out any node_modules files as we don't want to modify these when
 	// we save the project. Also, some .d.ts files get included for some reason
